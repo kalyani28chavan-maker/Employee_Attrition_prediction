@@ -145,3 +145,21 @@ try:
 except Exception as e:
     st.error("App could not start. Please check the error below.")
     st.exception(e)
+st.divider()
+st.header("📊 Attrition Analysis")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Department-wise Employees")
+    dept_data = df["Department"].value_counts()
+    st.bar_chart(dept_data)
+
+with col2:
+    st.subheader("Attrition Distribution")
+    attrition_data = df["Attrition"].value_counts()
+    st.bar_chart(attrition_data)
+
+st.subheader("Job Role-wise Attrition")
+role_data = pd.crosstab(df["JobRole"], df["Attrition"])
+st.bar_chart(role_data)
