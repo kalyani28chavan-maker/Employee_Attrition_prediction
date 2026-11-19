@@ -163,3 +163,32 @@ with col2:
 st.subheader("Job Role-wise Attrition")
 role_data = pd.crosstab(df["JobRole"], df["Attrition"])
 st.bar_chart(role_data)
+st.divider()
+st.header("💡 HR Business Insights")
+
+total_employees = len(df)
+left_employees = (df["Attrition"] == "Yes").sum()
+stayed_employees = (df["Attrition"] == "No").sum()
+
+attrition_rate = (left_employees / total_employees) * 100
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Employees Left", left_employees)
+col2.metric("Employees Stayed", stayed_employees)
+col3.metric("Attrition Rate", f"{attrition_rate:.2f}%")
+
+st.subheader("Business Summary")
+
+st.write(
+    f"Out of {total_employees} employees, "
+    f"{left_employees} employees have left the company."
+)
+
+st.write(
+    f"The company has retained {stayed_employees} employees."
+)
+
+st.info(
+    f"The overall employee attrition rate is {attrition_rate:.2f}%."
+)
