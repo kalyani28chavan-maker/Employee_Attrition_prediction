@@ -1,12 +1,11 @@
 
 import streamlit as st
 import pandas as pd
-import joblib
 
-# Load trained files
-model = joblib.load("employee_attrition_model.pkl")
-columns = joblib.load("model_columns.pkl")
-defaults = joblib.load("model_defaults.pkl")
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
 
 st.set_page_config(
     page_title="Employee Attrition Prediction",
@@ -16,103 +15,133 @@ st.set_page_config(
 
 st.title("🏢 Employee Attrition Prediction")
 st.write("AI Powered HR Analytics Dashboard")
-
 st.divider()
 
-st.subheader("Enter Employee Details")
+DATA_URL = "https://raw.githubusercontent.com/IamVasil/IBM-HR-Analytics-Employee-Attrition-Performance/main/WA_Fn-UseC_-HR-Employee-Attrition.csv"
 
-col1, col2 = st.columns(2)
+@st.cache_resource
+def train_model():
+    df = pd.read_csv(DATA_URL)
 
-with col1:
-    age = st.slider("Employee Age", 18, 60, 30)
-    income = st.number_input(
-        "Monthly Income",
-        min_value=1000,
-        max_value=20000,
-        value=5000
-    )
-    years = st.slider("Years at Company", 0, 40, 5)
-    overtime = st.selectbox("OverTime", ["No", "Yes"])
+    features = [
+        "Age", "MonthlyIncome", "YearsAtCompany",
+        "OverTime", "Department", "JobRole",
+        "MaritalStatus", "DistanceFromHome"
+    ]
 
-with col2:
-    department = st.selectbox(
-        "Department",
-        ["Sales", "Research & Development", "Human Resources"]
-    )
-    job_role = st.selectbox(
-        "Job Role",
-        [
-            "Sales Executive",
-            "Research Scientist",
-            "Laboratory Technician",
-            "Manufacturing Director",
-            "Healthcare Representative",
-            "Manager",
-            "Sales Representative",
-            "Research Director",
-            "Human Resources"
-        ]
-    )
-    marital = st.selectbox(
-        "Marital Status",
-        ["Single", "Married", "Divorced"]
-    )
-    distance = st.slider("Distance From Home", 1, 29, 5)
+    X = df[features]
+    y = df["Attrition"]
 
-if st.button("Predict Employee Attrition", type="primary"):
+    numeric_features = [
+        "Age", "MonthlyIncome",
+        "YearsAtCompany", "DistanceFromHome"
+    ]
 
-    input_data = pd.DataFrame([defaults], columns=columns)
+    categorical_features = [
+        "OverTime", "Department",
+        "JobRole", "MaritalStatus"
+    ]
 
-    # Update numerical values
-    numeric_values = {
-        "Age": age,
-        "MonthlyIncome": income,
-        "YearsAtCompany": years,
-        "DistanceFromHome": distance
-    }
+    preprocessor = ColumnTransformer([
+        ("numeric", "passthrough", numeric_features),
+        ("categorical", OneHotEncoder(handle_unknown="ignore"),
+         categorical_features)
+    ])
 
-    for feature, value in numeric_values.items():
-        if feature in input_data.columns:
-            input_data.loc[0, feature] = value
+    pipeline = Pipeline([
+        ("preprocessor", preprocessor),
+        ("model", RandomForestClassifier(
+            n_estimators=150,
+            random_state=42,
+            class_weight="balanced"
+        ))
+    ])
 
-    # Update categorical dummy columns
-    categories = {
-        "OverTime": overtime,
-        "Department": department,
-        "JobRole": job_role,
-        "MaritalStatus": marital
-    }
+    pipeline.fit(X, y)
 
-    for feature, value in categories.items():
-        prefix = feature + "_"
-        matching = [
-            c for c in columns if c.startswith(prefix)
-        ]
+    return pipeline, df
 
-        for c in matching:
-            input_data.loc[0, c] = 0
+try:
+    with st.spinner("Training AI model... Please wait"):
+        model, df = train_model()
 
-        dummy = prefix + value
+    st.success("AI Model trained successfully!")
 
-        if dummy in input_data.columns:
-            input_data.loc[0, dummy] = 1
+    st.subheader("Employee Details")
 
-    prediction = model.predict(input_data)[0]
-    probability = model.predict_proba(input_data)[0][1]
+    col1, col2 = st.columns(2)
+
+    with col1:
+        age = st.slider("Employee Age", 18, 60, 30)
+        income = st.number_input(
+            "Monthly Income", 1000, 20000, 5000
+        )
+        years = st.slider("Years at Company", 0, 40, 5)
+        overtime = st.selectbox("OverTime", ["No", "Yes"])
+
+    with col2:
+        department = st.selectbox(
+            "Department",
+            sorted(df["Department"].unique())
+        )
+
+        job_role = st.selectbox(
+            "Job Role",
+            sorted(df["JobRole"].unique())
+        )
+
+        marital = st.selectbox(
+            "Marital Status",
+            sorted(df["MaritalStatus"].unique())
+        )
+
+        distance = st.slider(
+            "Distance From Home", 1, 29, 5
+        )
+
+    if st.button("Predict Employee Attrition"):
+        employee = pd.DataFrame([{
+            "Age": age,
+            "MonthlyIncome": income,
+            "YearsAtCompany": years,
+            "OverTime": overtime,
+            "Department": department,
+            "JobRole": job_role,
+            "MaritalStatus": marital,
+            "DistanceFromHome": distance
+        }])
+
+        prediction = model.predict(employee)[0]
+        probability = model.predict_proba(employee)[0]
+
+        attrition_index = list(model.classes_).index("Yes")
+        risk = probability[attrition_index] * 100
+
+        st.divider()
+        st.subheader("Prediction Result")
+
+        st.metric("Employee Attrition Risk", f"{risk:.2f}%")
+
+        if prediction == "Yes":
+            st.error("Employee may leave the company.")
+        else:
+            st.success("Employee may stay in the company.")
+
+        st.caption(
+            "This is an AI-based estimate, not a guarantee."
+        )
 
     st.divider()
-    st.subheader("Prediction Result")
+    st.subheader("Dataset Overview")
 
-    st.metric(
-        "Estimated Attrition Risk Score",
-        f"{probability * 100:.2f}%"
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Employees", len(df))
+    col2.metric("Total Features", len(df.columns))
+    col3.metric(
+        "Attrition Cases",
+        int((df["Attrition"] == "Yes").sum())
     )
 
-    if prediction == 1:
-        st.error("⚠️ Model predicts: Employee may leave the company.")
-    else:
-        st.success("✅ Model predicts: Employee may stay in the company.")
-
-    st.caption(
-        "This is a machine learning estimate, not a certainty."
-    )
+except Exception as e:
+    st.error("App could not start. Please check the error below.")
+    st.exception(e)
