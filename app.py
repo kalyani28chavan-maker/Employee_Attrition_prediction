@@ -212,3 +212,19 @@ fig = px.pie(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+st.subheader("Department-wise Attrition")
+
+department_data = {
+    "Department": ["Sales", "Research & Development", "Human Resources"],
+    "Attrition": [25, 15, 10]
+}
+
+fig2 = px.bar(
+    department_data,
+    x="Department",
+    y="Attrition",
+    title="Attrition by Department",
+    color="Department"
+)
+
+st.plotly_chart(fig2, use_container_width=True)
