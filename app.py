@@ -88,7 +88,7 @@ try:
     )
 
     st.subheader("Top Employee Attrition Factors")
-
+    st.write(importance_df.head(10))
     st.bar_chart(
         importance_df.head(10).set_index("Feature")
     )
