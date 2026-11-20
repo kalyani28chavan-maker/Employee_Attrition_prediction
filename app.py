@@ -249,10 +249,9 @@ fig3 = px.bar(
 st.plotly_chart(fig3, use_container_width=True)
 st.subheader("Overtime vs Employee Attrition")
 
-overtime_data = {
-    "Overtime": ["Yes", "No"],
-    "Attrition": [35, 12]
-}
+overtime_data = df[df["Attrition"] == "Yes"].groupby(
+    "OverTime"
+).size().reset_index(name="Attrition")
 attrition_data = df["Attrition"].value_counts().reset_index()
 
 attrition_data.columns = ["Status", "Count"]
