@@ -89,9 +89,19 @@ try:
 
     st.subheader("Top Employee Attrition Factors")
     st.write(importance_df.head(10))
-    st.bar_chart(
-        importance_df.head(10).set_index("Feature")
-    )
+    import plotly.express as px
+
+fig = px.bar(
+    importance_df.head(10),
+    x="Importance",
+    y="Feature",
+    orientation="h",
+    title="Top 10 Employee Attrition Factors"
+)
+
+fig.update_layout(yaxis={"categoryorder": "total ascending"})
+
+st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Employee Details")
 
