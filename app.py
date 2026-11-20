@@ -186,6 +186,14 @@ except Exception as e:
     st.error("App could not start. Please check the error below.")
     st.exception(e)
 st.divider()
+st.header("🎯 Model Performance Analysis")
+
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric("Model Accuracy", "82.99%")
+col2.metric("Precision", "43%")
+col3.metric("Recall", "48.94%")
+col4.metric("ROC-AUC Score", "0.7597")
 st.header("📊 Attrition Analysis")
 
 col1, col2 = st.columns(2)
