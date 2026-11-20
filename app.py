@@ -70,27 +70,28 @@ try:
 
     st.success("AI Model trained successfully!")
 
-# Feature Importance Analysis
 
-preprocessor = model.named_steps["preprocessor"]
-rf_model = model.named_steps["model"]
+    # Feature Importance Analysis
 
-feature_names = preprocessor.get_feature_names_out()
+    preprocessor = model.named_steps["preprocessor"]
+    rf_model = model.named_steps["model"]
 
-importance_df = pd.DataFrame({
-    "Feature": feature_names,
-    "Importance": rf_model.feature_importances_
-})
+    feature_names = preprocessor.get_feature_names_out()
 
-importance_df = importance_df.sort_values(
-    by="Importance", ascending=False
-)
+    importance_df = pd.DataFrame({
+        "Feature": feature_names,
+        "Importance": rf_model.feature_importances_
+    })
 
-st.subheader("Top Employee Attrition Factors")
+    importance_df = importance_df.sort_values(
+        by="Importance", ascending=False
+    )
 
-st.bar_chart(
-    importance_df.head(10).set_index("Feature")
-)
+    st.subheader("Top Employee Attrition Factors")
+
+    st.bar_chart(
+        importance_df.head(10).set_index("Feature")
+    )
 
     st.subheader("Employee Details")
 
