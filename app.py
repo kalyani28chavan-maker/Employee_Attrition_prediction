@@ -192,3 +192,23 @@ st.write(
 st.info(
     f"The overall employee attrition rate is {attrition_rate:.2f}%."
 )
+st.header("Employee Attrition Analysis")
+
+st.subheader("Attrition Distribution")
+
+import plotly.express as px
+
+attrition_data = {
+    "Status": ["Employees Staying", "Employees Leaving"],
+    "Count": [83, 17]
+}
+
+fig = px.pie(
+    attrition_data,
+    names="Status",
+    values="Count",
+    title="Employee Attrition Distribution",
+    hole=0.4
+)
+
+st.plotly_chart(fig, use_container_width=True)
