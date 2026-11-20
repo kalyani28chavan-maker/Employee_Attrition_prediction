@@ -244,3 +244,19 @@ fig3 = px.bar(
 )
 
 st.plotly_chart(fig3, use_container_width=True)
+st.subheader("Overtime vs Employee Attrition")
+
+overtime_data = {
+    "Overtime": ["Yes", "No"],
+    "Attrition": [35, 12]
+}
+
+fig4 = px.bar(
+    overtime_data,
+    x="Overtime",
+    y="Attrition",
+    title="Attrition Based on Overtime",
+    color="Overtime"
+)
+
+st.plotly_chart(fig4, use_container_width=True)
