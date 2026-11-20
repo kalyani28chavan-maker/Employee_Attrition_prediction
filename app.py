@@ -217,11 +217,7 @@ fig = px.pie(
 st.plotly_chart(fig, use_container_width=True)
 st.subheader("Department-wise Attrition")
 
-department_data = {
-    "Department": ["Sales", "Research & Development", "Human Resources"],
-    "Attrition": [25, 15, 10]
-}
-
+department_data = df[df["Attrition"] == "Yes"].groupby("Department").size().reset_index(name="Attrition")
 fig2 = px.bar(
     department_data,
     x="Department",
