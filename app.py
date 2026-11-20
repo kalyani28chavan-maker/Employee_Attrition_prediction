@@ -1,7 +1,10 @@
 
 import streamlit as st
 import pandas as pd
+df = pd.read_csv("WA_Fn-UseC_-HR-Employee-Attrition.csv")
 
+st.write("Employee Dataset Preview")
+st.dataframe(df.head())
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
