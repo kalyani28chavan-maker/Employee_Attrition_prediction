@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 df = pd.read_csv("WA_Fn-UseC_-HR-Employee-Attrition.csv")
 
-st.write("Employee Dataset Preview")
+st.write("Employee Dataset Preview") 
 st.dataframe(df.head())
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
@@ -69,6 +69,28 @@ try:
         model, df = train_model()
 
     st.success("AI Model trained successfully!")
+
+# Feature Importance Analysis
+
+preprocessor = model.named_steps["preprocessor"]
+rf_model = model.named_steps["model"]
+
+feature_names = preprocessor.get_feature_names_out()
+
+importance_df = pd.DataFrame({
+    "Feature": feature_names,
+    "Importance": rf_model.feature_importances_
+})
+
+importance_df = importance_df.sort_values(
+    by="Importance", ascending=False
+)
+
+st.subheader("Top Employee Attrition Factors")
+
+st.bar_chart(
+    importance_df.head(10).set_index("Feature")
+)
 
     st.subheader("Employee Details")
 
@@ -262,4 +284,7 @@ fig4 = px.bar(
     title="Attrition Based on Overtime",
     color="OverTime"
 )
+
+
+
 st.plotly_chart(fig4, use_container_width=True)
