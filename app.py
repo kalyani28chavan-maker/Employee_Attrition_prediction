@@ -257,10 +257,9 @@ attrition_data = df["Attrition"].value_counts().reset_index()
 attrition_data.columns = ["Status", "Count"]
 fig4 = px.bar(
     overtime_data,
-    x="Overtime",
+    x="OverTime",
     y="Attrition",
     title="Attrition Based on Overtime",
-    color="Overtime"
+    color="OverTime"
 )
-
 st.plotly_chart(fig4, use_container_width=True)
