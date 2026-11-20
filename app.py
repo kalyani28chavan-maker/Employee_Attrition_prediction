@@ -228,3 +228,19 @@ fig2 = px.bar(
 )
 
 st.plotly_chart(fig2, use_container_width=True)
+st.subheader("Monthly Income Analysis")
+
+income_data = {
+    "Income Group": ["Low Income", "Medium Income", "High Income"],
+    "Attrition": [30, 18, 8]
+}
+
+fig3 = px.bar(
+    income_data,
+    x="Income Group",
+    y="Attrition",
+    title="Attrition by Monthly Income",
+    color="Income Group"
+)
+
+st.plotly_chart(fig3, use_container_width=True)
