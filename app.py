@@ -229,11 +229,15 @@ fig2 = px.bar(
 st.plotly_chart(fig2, use_container_width=True)
 st.subheader("Monthly Income Analysis")
 
-income_data = {
-    "Income Group": ["Low Income", "Medium Income", "High Income"],
-    "Attrition": [30, 18, 8]
-}
+df["Income Group"] = pd.cut(
+    df["MonthlyIncome"],
+    bins=[0, 3000, 7000, float("inf")],
+    labels=["Low Income", "Medium Income", "High Income"]
+)
 
+income_data = df[df["Attrition"] == "Yes"].groupby(
+    "Income Group", observed=False
+).size().reset_index(name="Attrition")
 fig3 = px.bar(
     income_data,
     x="Income Group",
