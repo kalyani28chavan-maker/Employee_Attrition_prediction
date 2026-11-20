@@ -253,7 +253,9 @@ overtime_data = {
     "Overtime": ["Yes", "No"],
     "Attrition": [35, 12]
 }
+attrition_data = df["Attrition"].value_counts().reset_index()
 
+attrition_data.columns = ["Status", "Count"]
 fig4 = px.bar(
     overtime_data,
     x="Overtime",
