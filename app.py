@@ -91,17 +91,21 @@ try:
     st.write(importance_df.head(10))
     import plotly.express as px
 
-fig = px.bar(
-    importance_df.head(10),
-    x="Importance",
-    y="Feature",
-    orientation="h",
-    title="Top 10 Employee Attrition Factors"
-)
+    import plotly.express as px
 
-fig.update_layout(yaxis={"categoryorder": "total ascending"})
+    fig = px.bar(
+        importance_df.head(10),
+        x="Importance",
+        y="Feature",
+        orientation="h",
+        title="Top 10 Employee Attrition Factors"
+    )
 
-st.plotly_chart(fig, use_container_width=True)
+    fig.update_layout(
+        yaxis={"categoryorder": "total ascending"}
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Employee Details")
 
